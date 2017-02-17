@@ -31,7 +31,14 @@
 ;; manually with M-x package-install
 ;; Add in your own as you wish:
 (defvar my-packages
-  '(;; makes handling lisp expressions much, much easier
+  '(;; starter-kit
+    better-defaults
+    idle-highlight-mode
+    find-file-in-project
+    scpaste
+    markdown-mode
+
+    ;; makes handling lisp expressions much, much easier
     ;; Cheatsheet: http://www.emacswiki.org/emacs/PareditCheatsheet
     paredit
 
@@ -130,3 +137,29 @@
 ;; Langauage-specific
 (load "setup-clojure.el")
 (load "setup-js.el")
+
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+(defun pt-pbpaste ()
+  "Paste data from pasteboard."
+  (interactive)
+  (shell-command-on-region
+   (point)
+   (if mark-active (mark) (point))
+   "pbpaste" nil t))
+
+(defun pt-pbcopy ()
+  "Copy region to pasteboard."
+  (interactive)
+  (print (mark))
+  (when mark-active
+    (shell-command-on-region
+     (point) (mark) "pbcopy")
+    (kill-buffer "*Shell Command Output*")))
+
+(global-set-key [?\C-x ?\C-y] 'pt-pbpaste)
+(global-set-key [?\C-x ?\M-w] 'pt-pbcopy)
+
+(setq flyspell-issue-welcome-flag nil)
+(setq-default ispell-program-name "/opt/local/bin/aspell")
+(setq-default ispell-list-command "list")
